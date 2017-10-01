@@ -4,7 +4,7 @@ require "open-uri"
 
 
 job_list = "job_list.txt"
-write_jobs = File.open(job_list, "w")
+write_jobs = File.open(job_list, "a")
 job_list = []
 
 task :scrap_jobs, [:arg] do |t, args|
@@ -12,9 +12,7 @@ task :scrap_jobs, [:arg] do |t, args|
   page = Nokogiri::HTML(open(url))
   vacancies = page.xpath('//div[starts-with(@id, "ctl00_ContentPlaceHolder1_SearchVacancies1_VacancySummaryUC1_lvVacancies_ctr")]')
   vacancies.each do |vacancy|
-    write_jobs.puts vacancy.css("span.v2_title").text
-    # job_list["job_title"] = vacancy.at('//span[contains(@id, "DatePosted")]').text
-    # job_list["job_title"] = vacancy.at('//span[contains(@id, "Salary")]').text
+    write_jobs.puts [vacancy.css("span.v2_title").text, vacancy.xpath('//span[contains(@id, "DatePosted")]').text, vacancy.at('//span[contains(@id, "Salary")]').text]
   end
 
 end
