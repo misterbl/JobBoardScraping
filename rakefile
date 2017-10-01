@@ -1,5 +1,4 @@
 require 'nokogiri'
-
 require "open-uri"
 
 
@@ -12,14 +11,8 @@ task :scrap_jobs, [:arg] do |t, args|
   page = Nokogiri::HTML(open(url))
   vacancies = page.xpath('//div[contains(@id, "_pnlVacancy")]')
   vacancies.each_with_index do |vacancy, index|
-    i = index + 1
-    p vacancy.css("span.v2_title").text
-    p vacancy.css("span#ctl00_ContentPlaceHolder1_SearchVacancies1_VacancySummaryUC1_lvVacancies_ctrl#{index}_lblDatePosted").text
-    p vacancy.css("span#ctl00_ContentPlaceHolder1_SearchVacancies1_VacancySummaryUC1_lvVacancies_ctrl#{index}_lblSalaryText").text
-     p i
     write_jobs.puts [vacancy.css("span.v2_title").text,
       vacancy.css("span#ctl00_ContentPlaceHolder1_SearchVacancies1_VacancySummaryUC1_lvVacancies_ctrl#{index}_lblDatePosted").text,
       vacancy.css("span#ctl00_ContentPlaceHolder1_SearchVacancies1_VacancySummaryUC1_lvVacancies_ctrl#{index}_lblSalaryText").text]
   end
-
 end
