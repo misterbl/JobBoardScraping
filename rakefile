@@ -2,16 +2,18 @@ require 'nokogiri'
 
 require "open-uri"
 
-url = 'https://jobonline.thecareersgroup.co.uk/careersgroup/student/Vacancies.aspx?st=marketing'
-page = Nokogiri::HTML(open(url))
+
 
 job_list = []
 
-task :scrap_jobs do
+task :scrap_jobs, [:arg] do |t, args|
+  url = "https://jobonline.thecareersgroup.co.uk/careersgroup/student/Vacancies.aspx?st=#{args[:arg].to_str}"
+  page = Nokogiri::HTML(open(url))
   vacancies = page.xpath('//div[starts-with(@id, "ctl00_ContentPlaceHolder1_SearchVacancies1_VacancySummaryUC1_lvVacancies_ctr")]')
   vacancies.each do |vacancy|
     job_list.push(vacancy.css("span.v2_title").text)
     # job_list["job_title"] = vacancy.at('//span[contains(@id, "DatePosted")]').text
     # job_list["job_title"] = vacancy.at('//span[contains(@id, "Salary")]').text
   end
+  p job_list
 end
