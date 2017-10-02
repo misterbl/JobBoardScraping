@@ -2,23 +2,34 @@ require 'nokogiri'
 require "open-uri"
 require 'mechanize'
 
-job_list = "job_list.txt"
-write_jobs = File.open(job_list, "a")
-agent = Mechanize.new
+jobs_summary = "jobs_summary.txt"
+full_jobs_ad = "full_jobs_ad.txt"
+
+jobs_summary = File.open(jobs_summary, "a")
+full_jobs_ad = File.open(full_jobs_ad, "a")
 
 
 task :scrap_jobs, [:arg] do |t, args|
-  page_mechanize = agent.get("https://jobonline.thecareersgroup.co.uk/careersgroup/student/Vacancies.aspx?st=#{args[:arg].to_str}")
-
-  review_links = page_mechanize.links_with(href: %r{DisplayVacancy.aspx})
-  p review_links
-  
   url = "https://jobonline.thecareersgroup.co.uk/careersgroup/student/Vacancies.aspx?st=#{args[:arg].to_str}"
+
   page = Nokogiri::HTML(open(url))
   vacancies = page.xpath('//div[contains(@id, "_pnlVacancy")]')
   vacancies.each_with_index do |vacancy, index|
-    write_jobs.puts [vacancy.css("span.v2_title").text,
+    jobs_summary.puts [vacancy.css("span.v2_title").text,
       vacancy.css("span#ctl00_ContentPlaceHolder1_SearchVacancies1_VacancySummaryUC1_lvVacancies_ctrl#{index}_lblDatePosted").text,
       vacancy.css("span#ctl00_ContentPlaceHolder1_SearchVacancies1_VacancySummaryUC1_lvVacancies_ctrl#{index}_lblSalaryText").text]
   end
+
+  agent = Mechanize.new
+  page_mechanize = agent.get(url)
+  jobs_links = page_mechanize.links_with(href: %r{DisplayVacancy.aspx})
+  jobs = jobs_links.map do |link|
+  job = link.click
+  job_meta = job.search('#main .job-meta .info')
+  contents = job.search("meta[name='description']").map { |n|
+  n['content']
+   full_jobs_ad.puts n['content']
+  }
+  end
+
 end
