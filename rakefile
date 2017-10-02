@@ -1,12 +1,18 @@
 require 'nokogiri'
 require "open-uri"
-
+require 'mechanize'
 
 job_list = "job_list.txt"
 write_jobs = File.open(job_list, "a")
+agent = Mechanize.new
 
 
 task :scrap_jobs, [:arg] do |t, args|
+  page_mechanize = agent.get("https://jobonline.thecareersgroup.co.uk/careersgroup/student/Vacancies.aspx?st=#{args[:arg].to_str}")
+
+  review_links = page_mechanize.links_with(href: %r{DisplayVacancy.aspx})
+  p review_links
+  
   url = "https://jobonline.thecareersgroup.co.uk/careersgroup/student/Vacancies.aspx?st=#{args[:arg].to_str}"
   page = Nokogiri::HTML(open(url))
   vacancies = page.xpath('//div[contains(@id, "_pnlVacancy")]')
