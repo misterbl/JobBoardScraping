@@ -2,10 +2,12 @@
 
 The application needs the 'nokogiri' and the "open-uri" to be installed first.
 On the command line type:
-$gem install nokogiri
+
+$ gem install nokogiri
 
 Once nokogiri is install, type:
-&gem install open-uri
+
+& gem install open-uri
 
 
 To scrap the job board for a particular industry, use the name of the industry as parameter
